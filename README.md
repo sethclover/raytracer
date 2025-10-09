@@ -1,1 +1,1 @@
-# raytracer
+# Raytracer for ComS 336
