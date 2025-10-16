@@ -43,9 +43,6 @@ class vec3 {
         double length() const {
             return std::sqrt(length_squared());
         }
-
-    private:
-
 };
 
 // Alias for geometric clarity
