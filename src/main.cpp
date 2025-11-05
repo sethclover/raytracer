@@ -1,9 +1,11 @@
 #include <memory>
 
-#include "camera.hpp"
-#include "hittable_list.h"
-#include "sphere.hpp"
-#include "vec3.hpp"
+#include "raytracer/camera.hpp"
+#include "raytracer/color.hpp"
+#include "raytracer/hittable_list.hpp"
+#include "raytracer/material.hpp"
+#include "raytracer/sphere.hpp"
+#include "raytracer/vec3.hpp"
 
 int main() {
     hittable_list world;
