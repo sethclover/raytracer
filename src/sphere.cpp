@@ -1,6 +1,6 @@
 #include "raytracer/sphere.hpp"
 
-bool sphere::hit(const ray& r, interval ray_t, hit_record& rec) const {
+bool sphere::hit(const ray& r, interval& ray_t, hit_record& rec) const {
     vec3 oc = center - r.origin();
     auto a = r.direction().length_squared();
     auto h = dot(r.direction(), oc);
