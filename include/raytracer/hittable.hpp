@@ -2,9 +2,11 @@
 
 #include <memory>
 
+#include "raytracer/aabb.hpp"
 #include "raytracer/color.hpp"
 #include "raytracer/interval.hpp"
 #include "raytracer/ray.hpp"
+#include "raytracer/vec3.hpp"
 
 class material;
 
@@ -23,5 +25,6 @@ class hit_record {
 class hittable {
     public:
         virtual ~hittable() = default;
-        virtual bool hit(const ray& r, interval& ray_t, hit_record& rec) const = 0;
+        virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
+        virtual aabb bounding_box() const = 0;
 };

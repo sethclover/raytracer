@@ -3,7 +3,7 @@
 #include "raytracer/triangle.hpp"
 #include "raytracer/utils.hpp"
 
-bool triangle::hit(const ray& r, interval& ray_t, hit_record& rec) const {
+bool triangle::hit(const ray& r, interval ray_t, hit_record& rec) const {
     // Moller-Trumbore intersection algorithm
     vec3 edge1 = v1 - v0;
     vec3 edge2 = v2 - v0;

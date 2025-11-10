@@ -1,6 +1,11 @@
 #include "raytracer/hittable_list.hpp"
 
-bool hittable_list::hit(const ray& r, interval& ray_t, hit_record& rec) const {
+void hittable_list::add(std::shared_ptr<hittable> object) {
+    bbox = aabb(bbox, object->bounding_box());
+    objects.push_back(std::move(object));
+}
+
+bool hittable_list::hit(const ray& r, interval ray_t, hit_record& rec) const {
     hit_record temp_rec;
     bool hit_anything = false;
     auto closest_so_far = ray_t.max;

@@ -64,8 +64,9 @@ ray camera::get_ray(int i, int j) const {
     auto pixel_sample = pixel00_loc + (i + offset.x()) * pixel_delta_u + (j + offset.y()) * pixel_delta_v;
     auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();;
     auto ray_direction = pixel_sample - ray_origin;
+    auto ray_time = random_double();
 
-    return ray(ray_origin, ray_direction);
+    return ray(ray_origin, ray_direction, ray_time);
 }
 
 vec3 camera::sample_square() const {
@@ -84,9 +85,8 @@ color camera::ray_color(const ray& r, int depth, const hittable& world) const {
     if (depth <= 0) return color(0, 0, 0);
     
     hit_record rec;
-    interval itvl(0.001, infinity);
 
-    if (world.hit(r, itvl, rec)) {
+    if (world.hit(r, interval(0.001, infinity), rec)) {
         ray scattered;
         color attenuation;
         if (rec.mat -> scatter(r, rec, attenuation, scattered)) {

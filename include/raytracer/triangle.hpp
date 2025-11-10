@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "raytracer/aabb.hpp"
 #include "raytracer/color.hpp"
 #include "raytracer/hittable.hpp"
 #include "raytracer/interval.hpp"
@@ -16,8 +17,10 @@ class triangle : public hittable {
                  std::shared_ptr<material> mat)
          : v0(v0), v1(v1), v2(v2), c0(c0), c1(c1), c2(c2), mat(mat) {}
 
-        bool hit(const ray& r, interval& ray_t, hit_record& rec) const override;
+        bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
         color get_color(float u, float v) const;
+        aabb bounding_box() const override { return bbox;}
+
 
     private: 
         point3 v0;
@@ -27,4 +30,5 @@ class triangle : public hittable {
         color c1;
         color c2;
         std::shared_ptr<material> mat;
+        aabb bbox;
 };
