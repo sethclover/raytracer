@@ -1,9 +1,5 @@
 #include "raytracer/hittable_list.hpp"
 
-hittable_list::hittable_list(std::shared_ptr<hittable> object) {
-    add(object);
-}
-
 bool hittable_list::hit(const ray& r, interval& ray_t, hit_record& rec) const {
     hit_record temp_rec;
     bool hit_anything = false;
