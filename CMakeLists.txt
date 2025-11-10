@@ -17,8 +17,9 @@ add_executable(raytracer ${SOURCES})
 # Specify public include directories
 target_include_directories(raytracer
     PUBLIC
-        ${CMAKE_SOURCE_DIR}/include       # for all headers in include/raytracer
+        ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/include/raytracer
+        ${CMAKE_SOURCE_DIR}/third_party
 )
 
 # Set compiler warnings per target

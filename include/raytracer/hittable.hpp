@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "raytracer/color.hpp"
 #include "raytracer/interval.hpp"
 #include "raytracer/ray.hpp"
 
@@ -12,6 +13,7 @@ class hit_record {
         point3 p;
         vec3 normal;
         std::shared_ptr<material> mat;
+        color albedo;
         double t;
         bool front_face;
 

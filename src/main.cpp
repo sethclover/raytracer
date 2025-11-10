@@ -5,6 +5,7 @@
 #include "raytracer/hittable_list.hpp"
 #include "raytracer/material.hpp"
 #include "raytracer/sphere.hpp"
+#include "raytracer/triangle.hpp"
 #include "raytracer/vec3.hpp"
 
 int main(int argc, char** argv) {
@@ -39,8 +40,8 @@ int main(int argc, char** argv) {
         /*
          * Standard scene
          */
-        auto ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
-        world.add(std::make_unique<sphere>(point3(0,-1000,0), 1000, ground_material));
+        auto ground_material = std::make_shared<lambertian>();
+        world.add(std::make_unique<sphere>(point3(0,-1000,0), 1000, color(0.5, 0.5, 0.5), ground_material));
 
         for (int a = -11; a < 11; a++) {
             for (int b = -11; b < 11; b++) {
@@ -53,36 +54,36 @@ int main(int argc, char** argv) {
                     if (choose_mat < 0.8) {
                         // diffuse
                         auto albedo = color::random() * color::random();
-                        sphere_material = std::make_shared<lambertian>(albedo);
-                        world.add(std::make_unique<sphere>(center, 0.2, sphere_material));
+                        sphere_material = std::make_shared<lambertian>();
+                        world.add(std::make_unique<sphere>(center, 0.2, albedo, sphere_material));
                     } else if (choose_mat < 0.95) {
                         // metal
                         auto albedo = color::random(0.5, 1);
                         auto fuzz = random_double(0, 0.5);
-                        sphere_material = std::make_shared<metal>(albedo, fuzz);
-                        world.add(std::make_unique<sphere>(center, 0.2, sphere_material));
+                        sphere_material = std::make_shared<metal>(fuzz);
+                        world.add(std::make_unique<sphere>(center, 0.2, albedo, sphere_material));
                     } else {
                         // glass
                         sphere_material = std::make_shared<dielectric>(1.5);
-                        world.add(std::make_unique<sphere>(center, 0.2, sphere_material));
+                        world.add(std::make_unique<sphere>(center, 0.2, colors::white(), sphere_material));
                     }
                 }
             }
         }
 
         auto material1 = std::make_shared<dielectric>(1.5);
-        world.add(std::make_unique<sphere>(point3(0, 1, 0), 1.0, material1));
+        world.add(std::make_unique<sphere>(point3(0, 1, 0), 1.0, colors::white(), material1));
 
-        auto material2 = std::make_shared<lambertian>(color(0.4, 0.2, 0.1));
-        world.add(std::make_unique<sphere>(point3(-4, 1, 0), 1.0, material2));
+        auto material2 = std::make_shared<lambertian>();
+        world.add(std::make_unique<sphere>(point3(-4, 1, 0), 1.0, color(0.4, 0.2, 0.1), material2));
 
-        auto material3 = std::make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-        world.add(std::make_unique<sphere>(point3(4, 1, 0), 1.0, material3));
+        auto material3 = std::make_shared<metal>(0.0);
+        world.add(std::make_unique<sphere>(point3(4, 1, 0), 1.0, color(0.7, 0.6, 0.5), material3));
 
         cam.aspect_ratio = 16.0 / 9.0;
-        cam.image_width = 1200;
-        cam.samples_per_pixel = 500;
-        cam.max_depth = 50;
+        cam.image_width = 720;
+        cam.samples_per_pixel = 256;
+        cam.max_depth = 16;
         cam.vfov = 20;
         cam.lookfrom = point3(13, 2, 3);
         cam.lookat = point3(0, 0, 0);
@@ -94,28 +95,43 @@ int main(int argc, char** argv) {
         /*
         * Simple scene
         */
-        auto material_ground = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
-        auto material_center = std::make_shared<lambertian>(color(0.1, 0.2, 0.5));
-        auto material_left   = std::make_shared<dielectric>(1.50);
-        auto material_bubble = std::make_shared<dielectric>(1.00 / 1.50);
-        auto material_right  = std::make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
+        // auto material_ground = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
+        // auto material_center = std::make_shared<lambertian>(color(0.1, 0.2, 0.5));
+        // auto material_left   = std::make_shared<dielectric>(1.50);
+        // auto material_bubble = std::make_shared<dielectric>(1.00 / 1.50);
+        // auto material_right  = std::make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
 
-        world.add(std::make_unique<sphere>(point3( 0.0, -100.5, -1.0), 100.0, material_ground));
-        world.add(std::make_unique<sphere>(point3( 0.0,    0.0, -1.2),   0.5, material_center));
-        world.add(std::make_unique<sphere>(point3(-1.0,    0.0, -1.0),   0.5, material_left));
-        world.add(std::make_unique<sphere>(point3(-1.0,    0.0, -1.0),   0.4, material_bubble));
-        world.add(std::make_unique<sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));
+        // world.add(std::make_unique<sphere>(point3( 0.0, -100.5, -1.0), 100.0, material_ground));
+        // world.add(std::make_unique<sphere>(point3( 0.0,    0.0, -1.2),   0.5, material_center));
+        // world.add(std::make_unique<sphere>(point3(-1.0,    0.0, -1.0),   0.5, material_left));
+        // world.add(std::make_unique<sphere>(point3(-1.0,    0.0, -1.0),   0.4, material_bubble));
+        // world.add(std::make_unique<sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));
+
+        // cam.aspect_ratio = 16.0 / 9.0;
+        // cam.image_width  = 480;      // Increase image width for higher resolution
+        // cam.samples_per_pixel = 128; // Increase samples per pixel for better quality
+        // cam.max_depth = 16;          // Increase max depth for more ray bounces
+        // cam.vfov = 45;               // Set vertical field of view
+        // cam.lookfrom = point3(-2, 2, 1);
+        // cam.lookat = point3(0, 0, -1);
+        // cam.vup = vec3(0, 1, 0);
+        // cam.defocus_angle = 10.0;    // Set defocus angle for depth of field effect
+        // cam.focus_dist = 3.4;        // Set focus distance
+
+        auto material_center = std::make_shared<lambertian>();
+        world.add(std::make_unique<triangle>(point3(-0.5, 0.0, -1.0), point3(0.5, 0.0, -1.0), point3(0.0, 1.0, -1.0),
+                                             colors::red(), colors::green(), colors::blue(), material_center));
 
         cam.aspect_ratio = 16.0 / 9.0;
         cam.image_width  = 480;      // Increase image width for higher resolution
-        cam.samples_per_pixel = 128; // Increase samples per pixel for better quality
-        cam.max_depth = 16;          // Increase max depth for more ray bounces
+        cam.samples_per_pixel = 64; // Increase samples per pixel for better quality
+        cam.max_depth = 4;          // Increase max depth for more ray bounces
         cam.vfov = 45;               // Set vertical field of view
-        cam.lookfrom = point3(-2, 2, 1);
-        cam.lookat = point3(0, 0, -1);
+        cam.lookfrom = point3(0, 0.5, 1);
+        cam.lookat = point3(0, 0.5, -1);
         cam.vup = vec3(0, 1, 0);
-        cam.defocus_angle = 10.0;    // Set defocus angle for depth of field effect
-        cam.focus_dist = 3.4;        // Set focus distance
+        cam.defocus_angle = 0.0;    // Set defocus angle for depth of field effect
+        cam.focus_dist = 2.0;        // Set focus distance
     }
 
     cam.render(world);
