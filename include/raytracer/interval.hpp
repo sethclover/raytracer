@@ -8,9 +8,11 @@ class interval {
     public:
         double min;
         double max;
+        static const interval empty;
+        static const interval infinite;
         
         interval() : min(+infinity), max(-infinity) {}
-        interval(double min, double max) : min(min), max(max) {}
+        constexpr interval(double min, double max) : min(min), max(max) {}
         interval(const interval& a, const interval& b)
          : min(std::fmin(a.min, b.min)), max(std::fmax(a.max, b.max)) {}
         double size() const { return max - min; }
@@ -19,3 +21,6 @@ class interval {
         double clamp(double x) const { return x < min ? min : (x > max ? max : x); }
         interval expand(double delta) const { return interval(min - delta / 2, max + delta / 2); }
 };
+
+inline const interval interval::empty = interval(+infinity, -infinity);
+inline const interval interval::infinite = interval(-infinity, +infinity);

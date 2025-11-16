@@ -33,7 +33,7 @@ bool triangle::hit(const ray& r, interval ray_t, hit_record& rec) const {
     return true;
 }
 
-color triangle::get_color(float u, float v) const {
-    float w = 1.0f - u - v;
+color triangle::get_color(double u, double v) const {
+    double w = 1.0 - u - v;
     return w * c0 + u * c1 + v * c2;
 }

@@ -31,3 +31,12 @@ bool aabb::hit(const ray& r, interval ray_t) const {
 
     return true;
 }
+
+int aabb::longest_axis() const {
+    if (x.size() > y.size()) {
+        return x.size() > z.size() ? 0 : 2;
+    }
+    else {
+        return y.size() > z.size() ? 1 : 2;
+    }
+}

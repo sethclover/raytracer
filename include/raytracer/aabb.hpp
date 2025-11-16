@@ -9,6 +9,8 @@
 class aabb {
     public:
         interval x, y, z;
+        static const aabb empty;
+        static const aabb infinite;
 
         aabb() = default;
         aabb(const interval& x, const interval& y, const interval& z)
@@ -24,4 +26,8 @@ class aabb {
 
         const interval& axis_interval(int n) const;
         bool hit(const ray& r, interval ray_t) const;
+        int longest_axis() const;
 };
+
+inline const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
+inline const aabb aabb::infinite = aabb(interval::infinite, interval::infinite, interval::infinite);

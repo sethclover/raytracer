@@ -18,7 +18,7 @@ class triangle : public hittable {
          : v0(v0), v1(v1), v2(v2), c0(c0), c1(c1), c2(c2), mat(mat) {}
 
         bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
-        color get_color(float u, float v) const;
+        color get_color(double u, double v) const;
         aabb bounding_box() const override { return bbox;}
 
 
