@@ -9,12 +9,13 @@ class interval {
         double min;
         double max;
         static const interval empty;
-        static const interval infinite;
+        static const interval universe;
         
         interval() : min(+infinity), max(-infinity) {}
         constexpr interval(double min, double max) : min(min), max(max) {}
         interval(const interval& a, const interval& b)
          : min(std::fmin(a.min, b.min)), max(std::fmax(a.max, b.max)) {}
+        
         double size() const { return max - min; }
         bool contains(double x) const { return min <= x && x <= max; }
         bool surrounds(double x) const { return min < x && x < max; }
@@ -23,4 +24,4 @@ class interval {
 };
 
 inline const interval interval::empty = interval(+infinity, -infinity);
-inline const interval interval::infinite = interval(-infinity, +infinity);
+inline const interval interval::universe = interval(-infinity, +infinity);

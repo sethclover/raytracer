@@ -8,9 +8,11 @@
 
 class aabb {
     public:
-        interval x, y, z;
+        interval x;
+        interval y;
+        interval z;
         static const aabb empty;
-        static const aabb infinite;
+        static const aabb universe;
 
         aabb() = default;
         aabb(const interval& x, const interval& y, const interval& z)
@@ -26,8 +28,8 @@ class aabb {
 
         const interval& axis_interval(int n) const;
         bool hit(const ray& r, interval ray_t) const;
-        int longest_axis() const;
+        int longest_axis() const; // Returns index of longest axis in bbox
 };
 
 inline const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
-inline const aabb aabb::infinite = aabb(interval::infinite, interval::infinite, interval::infinite);
+inline const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
