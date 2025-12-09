@@ -11,16 +11,18 @@
 
 class camera {
     public:
-        double aspect_ratio = 1.0;         // Ratio of image width over height
-        int image_width = 100;             // Rendered image width in pixel count
-        int samples_per_pixel = 10;        // Count of random samples per pixel
-        int max_depth = 10;                // Maximum number of raybounces into scene
-        double vfov = 90;                  // Vertical field of view in degrees
-        point3 lookfrom = point3(0, 0, 0); // Point camera is looking from
-        point3 lookat = point3(0, 0, -1);  // Point camera is looking at
-        vec3 vup = vec3(0, 1, 0);          // "Up" direction for camera orientation
-        double defocus_angle = 0;          // Defocus angle for depth of field effect
-        double focus_dist = 10;            // Distance from camera lookfrom to plan of focus
+        double aspect_ratio;    // Ratio of image width over height
+        int image_width;        // Rendered image width in pixel count
+        int samples_per_pixel;  // Count of random samples per pixel
+        int max_depth;          // Maximum number of raybounces into scene
+        double vfov;            // Vertical field of view in degrees
+        point3 lookfrom;        // Point camera is looking from
+        point3 lookat;          // Point camera is looking at
+        vec3 vup;               // "Up" direction for camera orientation
+        double defocus_angle;   // Defocus angle for depth of field effect
+        double focus_dist;      // Distance from camera lookfrom to plan of focus
+
+        camera() = default;
 
         void render(const hittable& world);
 

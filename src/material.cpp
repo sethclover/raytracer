@@ -7,7 +7,7 @@ bool lambertian::scatter(const ray& r_in [[maybe_unused]], const hit_record& rec
     if (scatter_direction.near_zero()) scatter_direction = rec.normal;
 
     scattered = ray(rec.p, scatter_direction, r_in.time());
-    attenuation = rec.albedo;
+    attenuation = tex->value(rec.u, rec.v, rec.p);
 
     return true;
 }
@@ -16,7 +16,7 @@ bool metal::scatter(const ray& r_in, const hit_record& rec, color& attenuation, 
     vec3 reflected = reflect(r_in.direction(), rec.normal);
     reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
     scattered = ray(rec.p, reflected, r_in.time());
-    attenuation = rec.albedo;
+    attenuation = albedo;
 
     return (dot(scattered.direction(), rec.normal) > 0);
 }

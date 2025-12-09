@@ -1,5 +1,8 @@
 .vs/
 .vscode/
+
 build/
+image/
 out/
+
 *.ppm

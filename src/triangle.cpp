@@ -28,7 +28,7 @@ bool triangle::hit(const ray& r, interval ray_t, hit_record& rec) const {
     vec3 outward_normal = cross(edge1, edge2);
     rec.set_face_normal(r, outward_normal);
     rec.mat = mat;
-    rec.albedo = get_color(u, v);
+    //rec.albedo = get_color(u, v);
 
     return true;
 }
