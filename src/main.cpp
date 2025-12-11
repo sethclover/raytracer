@@ -11,7 +11,7 @@
 #include "raytracer/triangle.hpp"
 #include "raytracer/vec3.hpp"
 
-static constexpr unsigned SCENE_COUNT = 3;
+static constexpr unsigned SCENE_COUNT = 4;
 
 // -h for help or number to choose from scenes
 static const std::string_view usage = "Usage: raytracer [-h|--help|<scene_number>]\n"
@@ -131,6 +131,29 @@ void earth() {
     cam.render(hittable_list(globe));
 }
 
+void perlin_spheres() {
+    hittable_list world;
+
+    auto pertext = std::make_shared<noise_texture>(4);
+    world.add(std::make_shared<sphere>(point3(0, -1000, 0), 1000, std::make_shared<lambertian>(pertext)));
+    world.add(std::make_shared<sphere>(point3(0, 2, 0), 2, std::make_shared<lambertian>(pertext)));
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 16;
+    cam.vfov = 20;
+    cam.lookfrom = point3(13, 2, 3);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         std::cerr << "Error: Expected 1 argument.\n" << usage;
@@ -159,9 +182,14 @@ int main(int argc, char** argv) {
 
     if (scene_choice == 1) {
         bouncing_spheres();
-    } else if (scene_choice == 2) {
+    } 
+    else if (scene_choice == 2) {
         checkered_spheres();
-    } else if (scene_choice == 3) {
+    } 
+    else if (scene_choice == 3) {
         earth();
+    }
+    else if (scene_choice == 4) {
+        perlin_spheres();
     }
 }

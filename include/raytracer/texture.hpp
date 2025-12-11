@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "raytracer/color.hpp"
+#include "raytracer/perlin.hpp"
 #include "raytracer/rtw_std_image.hpp"
 #include "raytracer/vec3.hpp"
 
@@ -49,4 +50,15 @@ class image_texture : public texture {
 
     private:
         rtw_image image;
+};
+
+class noise_texture : public texture {
+    public:
+        noise_texture(double scale) : scale(scale) {}
+
+        color value(double u [[maybe_unused]], double v [[maybe_unused]], const point3& p) const override;
+    
+    private:
+        double scale;
+        perlin noise;
 };

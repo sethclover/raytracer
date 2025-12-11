@@ -25,3 +25,7 @@ color image_texture::value(double u, double v, const point3& p [[maybe_unused]])
     auto color_scale = 1.0 / 255.0;
     return color(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]);
 }
+
+color noise_texture::value(double u [[maybe_unused]], double v [[maybe_unused]], const point3& p) const {
+    return color(0.5, 0.5, 0.5) * (1 + std::sin(scale * p.z() + 10 * noise.turb(p, 7)));
+}
