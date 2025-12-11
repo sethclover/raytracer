@@ -16,11 +16,11 @@ class aabb {
 
         aabb() = default;
         aabb(const interval& x, const interval& y, const interval& z)
-         : x(x), y(y), z(z) {}
+         : x(x), y(y), z(z) { pad_to_minimums(); }
         aabb(const point3& a, const point3& b)
          : x(interval(std::fmin(a.x(), b.x()), std::fmax(a.x(), b.x()))),
            y(interval(std::fmin(a.y(), b.y()), std::fmax(a.y(), b.y()))),
-           z(interval(std::fmin(a.z(), b.z()), std::fmax(a.z(), b.z()))) {}
+           z(interval(std::fmin(a.z(), b.z()), std::fmax(a.z(), b.z()))) { pad_to_minimums(); }
         aabb(const aabb& box0, const aabb& box1)
          : x(interval(box0.x, box1.x)),
            y(interval(box0.y, box1.y)),
@@ -29,6 +29,9 @@ class aabb {
         const interval& axis_interval(int n) const;
         bool hit(const ray& r, interval ray_t) const;
         int longest_axis() const; // Returns index of longest axis in bbox
+
+    private:
+        void pad_to_minimums();
 };
 
 inline const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);

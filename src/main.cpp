@@ -6,15 +6,16 @@
 #include "raytracer/color.hpp"
 #include "raytracer/hittable_list.hpp"
 #include "raytracer/material.hpp"
+#include "raytracer/quad.hpp"
 #include "raytracer/sphere.hpp"
 #include "raytracer/texture.hpp"
 #include "raytracer/triangle.hpp"
 #include "raytracer/vec3.hpp"
 
-static constexpr unsigned SCENE_COUNT = 4;
+static constexpr unsigned SCENE_COUNT = 6;
 
 // -h for help or number to choose from scenes
-static const std::string_view usage = "Usage: raytracer [-h|--help|<scene_number>]\n"
+static const std::string usage = "Usage: raytracer [-h | --help | <scene_number>]\n"
                                           "  -h, --help       Show this help message\n"
                                           "  <scene_number>   Scene to render (1-" + std::to_string(SCENE_COUNT) + ")\n";
 
@@ -154,6 +155,84 @@ void perlin_spheres() {
     cam.render(world);
 }
 
+void quads() {
+    hittable_list world;
+
+    // Materials
+    auto left_red     = std::make_shared<lambertian>(color(1.0, 0.2, 0.2));
+    auto back_green   = std::make_shared<lambertian>(color(0.2, 1.0, 0.2));
+    auto right_blue   = std::make_shared<lambertian>(color(0.2, 0.2, 1.0));
+    auto upper_orange = std::make_shared<lambertian>(color(1.0, 0.5, 0.0));
+    auto lower_teal   = std::make_shared<lambertian>(color(0.2, 0.8, 0.8));
+
+    // Quads
+    world.add(std::make_shared<quad>(point3(-3,-2, 5), vec3(0, 0,-4), vec3(0, 4, 0), left_red));
+    world.add(std::make_shared<quad>(point3(-2,-2, 0), vec3(4, 0, 0), vec3(0, 4, 0), back_green));
+    world.add(std::make_shared<quad>(point3( 3,-2, 1), vec3(0, 0, 4), vec3(0, 4, 0), right_blue));
+    world.add(std::make_shared<quad>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4), upper_orange));
+    world.add(std::make_shared<quad>(point3(-2,-3, 5), vec3(4, 0, 0), vec3(0, 0,-4), lower_teal));
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 16;
+    cam.vfov = 80;
+    cam.lookfrom = point3(0, 0, 9);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
+void octohedron() {
+    hittable_list world;
+
+    // Materials
+    auto red     = std::make_shared<lambertian>(colors::red());
+    auto green   = std::make_shared<lambertian>(colors::green());
+    auto blue    = std::make_shared<lambertian>(colors::blue());
+    auto yellow  = std::make_shared<lambertian>(colors::yellow());
+    auto magenta = std::make_shared<lambertian>(colors::magenta());
+    auto red2    = std::make_shared<lambertian>(colors::red2());
+    auto orange  = std::make_shared<lambertian>(colors::orange());
+    auto purple  = std::make_shared<lambertian>(colors::purple());
+    
+    point3 top(0, 2, 0);
+    point3 bottom(0, -2, 0);
+
+    // Octahedron top pyramid
+    world.add(std::make_shared<triangle>(top, vec3(-2,-2, 2), vec3( 2,-2, 2), red));    // front
+    world.add(std::make_shared<triangle>(top, vec3(-2,-2,-2), vec3(-2,-2, 2), green));  // left
+    world.add(std::make_shared<triangle>(top, vec3( 2,-2, 2), vec3( 2,-2,-2), blue));   // right
+    world.add(std::make_shared<triangle>(top, vec3( 2,-2,-2), vec3(-2,-2,-2), yellow)); // back
+    
+
+    // Octahedron bottom pyramid
+    world.add(std::make_shared<triangle>(bottom, vec3( 2, 2, 2), vec3(-2, 2, 2), magenta)); // front
+    world.add(std::make_shared<triangle>(bottom, vec3(-2, 2, 2), vec3(-2, 2,-2), red2));    // left
+    world.add(std::make_shared<triangle>(bottom, vec3(-2, 2,-2), vec3( 2, 2,-2), orange));  // back
+    world.add(std::make_shared<triangle>(bottom, vec3( 2, 2,-2), vec3( 2, 2, 2), purple));  // right
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 600;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 16;
+    cam.vfov = 40;
+    cam.lookfrom = point3(5, 1, 8);
+    cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         std::cerr << "Error: Expected 1 argument.\n" << usage;
@@ -192,4 +271,12 @@ int main(int argc, char** argv) {
     else if (scene_choice == 4) {
         perlin_spheres();
     }
+    else if (scene_choice == 5) {
+        quads();
+    }
+    else if (scene_choice == 6) {
+        octohedron();
+    }
+
+    return 0;
 }

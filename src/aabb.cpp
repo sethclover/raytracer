@@ -40,3 +40,12 @@ int aabb::longest_axis() const {
         return y.size() > z.size() ? 1 : 2;
     }
 }
+
+void aabb::pad_to_minimums() {
+    // Adjust the AABB so that no side is narrower than some delta
+
+    double delta = 0.0001;
+    if (x.size() < delta) x = x.expand(delta);
+    if (y.size() < delta) y = y.expand(delta);
+    if (z.size() < delta) z = z.expand(delta);
+}

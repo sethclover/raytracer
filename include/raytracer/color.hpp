@@ -8,11 +8,17 @@
 using color = vec3;
 
 namespace colors {
-    inline color black() { return color(0.0, 0.0, 0.0); }
-    inline color white() { return color(1.0, 1.0, 1.0); }
-    inline color red()   { return color(1.0, 0.0, 0.0); }
-    inline color green() { return color(0.0, 1.0, 0.0); }
-    inline color blue()  { return color(0.0, 0.0, 1.0); }
+    inline color black()   { return color(0.0, 0.0, 0.0); }
+    inline color white()   { return color(1.0, 1.0, 1.0); }
+    inline color red()     { return color(1.0, 0.0, 0.0); }
+    inline color red2()    { return color(1.0, 0.3, 0.3); }
+    inline color green()   { return color(0.0, 1.0, 0.0); }
+    inline color blue()    { return color(0.0, 0.0, 1.0); }
+    inline color yellow()  { return color(1.0, 1.0, 0.0); }
+    inline color magenta() { return color(1.0, 0.0, 1.0); }
+    inline color cyan()    { return color(0.0, 1.0, 1.0); }
+    inline color orange()  { return color(1.0, 0.5, 0.0); }
+    inline color purple()  { return color(0.5, 0.0, 0.5); }
 }
 
 double linear_to_gamma(double linear_component);
