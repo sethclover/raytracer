@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 
 #include "raytracer/color.hpp"
 #include "raytracer/hittable.hpp"
@@ -25,7 +26,7 @@ class camera {
 
         camera() = default;
 
-        void render(const hittable& world);
+        void render(const hittable& world, const std::string& output_filename);
 
     private:
         int image_height;           // Rendered image height

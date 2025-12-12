@@ -1,23 +1,28 @@
 #include "raytracer/camera.hpp"
+#include "raytracer/image.hpp"
 
-void camera::render(const hittable& world) {
+void camera::render(const hittable& world, const std::string& output_filename) {
     initialize();
 
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    image img(image_width, image_height);
 
     for (int j = 0; j < image_height; j++) {
-        std::clog << "\rScanlines remaining: " << image_height - j << ' ' << std::flush;
+        std::cerr << "\rScanlines remaining: " << image_height - j << std::flush;
         for (int i = 0; i < image_width; i++) {
             color pixel_color(0, 0, 0);
             for (int sample = 0; sample < samples_per_pixel; sample++) {
                 ray r = get_ray(i, j);
                 pixel_color += ray_color(r, max_depth, world);
             }
-            write_color(std::cout, pixel_samples_scale * pixel_color);
+            pixel_color /= samples_per_pixel;
+
+            img.at(i, j) = pixel_color;
         }
     }
 
-    std::clog << "\rDone.                  \n";
+    std::cerr << "\rDone.                         \n";
+
+    img.write_ppm(output_filename);
 }
 
 void camera::initialize() {

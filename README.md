@@ -24,9 +24,9 @@ to see usage.
 
 Example Usage:
 ```bash
-./build/raytracer 2 > scene2_image.ppm
+./build/raytracer 2
 ```
-will output scene 2 into the output image scene2_image.ppm.
+will output scene 2 into the images/<scene_name>_2.ppm
 
 ### 2.1 Textures
 
@@ -55,4 +55,4 @@ Windows:
 ./scripts/clean.bat
 ```
 
-This will remove the build directory AND any .ppm files
+This will remove the build directory

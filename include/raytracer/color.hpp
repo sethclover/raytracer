@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <iostream>
 
 #include "raytracer/interval.hpp"
@@ -21,5 +22,7 @@ namespace colors {
     inline color purple()  { return color(0.5, 0.0, 0.5); }
 }
 
-double linear_to_gamma(double linear_component);
-void write_color(std::ostream& out, const color& pixel_color);
+inline double linear_to_gamma(double linear_component) {
+    if (linear_component > 0) return std::sqrt(linear_component);
+    else return 0.0;
+}
