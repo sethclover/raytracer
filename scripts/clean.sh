@@ -1,5 +1,5 @@
 #!/bin/bash
-# clean.sh - Remove the entire build directory and .ppm files
+# clean.sh - Remove the entire build directory
 
 set -e
 
@@ -14,9 +14,5 @@ if [ -d "$BUILD_DIR" ]; then
 else
   echo "[clean.sh] Nothing to clean. ($BUILD_DIR does not exist)"
 fi
-
-# Remove all .ppm files in the project directory and subdirectories
-echo "[clean.sh] Removing .ppm files..."
-find . -type f -name "*.ppm" -exec rm -f {} +
 
 echo "[clean.sh] Cleaning complete."

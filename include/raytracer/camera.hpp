@@ -15,6 +15,7 @@ class camera {
         int image_width;        // Rendered image width in pixel count
         int samples_per_pixel;  // Count of random samples per pixel
         int max_depth;          // Maximum number of raybounces into scene
+        color background;       // Scene background color
         double vfov;            // Vertical field of view in degrees
         point3 lookfrom;        // Point camera is looking from
         point3 lookat;          // Point camera is looking at

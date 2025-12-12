@@ -12,7 +12,7 @@
 #include "raytracer/triangle.hpp"
 #include "raytracer/vec3.hpp"
 
-static constexpr unsigned SCENE_COUNT = 6;
+static constexpr unsigned SCENE_COUNT = 8;
 
 // -h for help or number to choose from scenes
 static const std::string usage = "Usage: raytracer [-h | --help | <scene_number>]\n"
@@ -75,6 +75,7 @@ void bouncing_spheres() {
     cam.image_width = 400;
     cam.samples_per_pixel = 100;
     cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);
     cam.lookat = point3(0, 0, 0);
@@ -101,6 +102,7 @@ void checkered_spheres() {
     cam.image_width = 400;
     cam.samples_per_pixel = 100;
     cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);
     cam.lookat = point3(0, 0, 0);
@@ -122,6 +124,7 @@ void earth() {
     cam.image_width = 400;
     cam.samples_per_pixel = 100;
     cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
     cam.vfov = 20;
     cam.lookfrom = point3(0, 0, 12);
     cam.lookat = point3(0, 0, 0);
@@ -145,6 +148,7 @@ void perlin_spheres() {
     cam.image_width = 400;
     cam.samples_per_pixel = 100;
     cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);
     cam.lookat = point3(0, 0, 0);
@@ -178,6 +182,7 @@ void quads() {
     cam.image_width = 400;
     cam.samples_per_pixel = 100;
     cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
     cam.vfov = 80;
     cam.lookfrom = point3(0, 0, 9);
     cam.lookat = point3(0, 0, 0);
@@ -223,9 +228,80 @@ void octohedron() {
     cam.image_width = 600;
     cam.samples_per_pixel = 100;
     cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
     cam.vfov = 40;
     cam.lookfrom = point3(5, 1, 8);
     cam.lookat = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
+void simple_light() {
+    hittable_list world;
+
+    auto pertext = std::make_shared<noise_texture>(4);
+    world.add(std::make_shared<sphere>(point3(0, -1000, 0), 1000, std::make_shared<lambertian>(pertext)));
+    world.add(std::make_shared<sphere>(point3(0, 2, 0), 2, std::make_shared<lambertian>(pertext)));
+
+    auto difflight = std::make_shared<diffuse_light>(color(4, 4, 4));
+    world.add(std::make_shared<sphere>(point3(0, 7, 0), 2, difflight));
+    world.add(std::make_shared<quad>(point3(3, 1, -2), vec3(2, 0, 0), vec3(0, 2, 0), difflight));
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 16;
+    cam.background = colors::black();
+    cam.vfov = 20;
+    cam.lookfrom = point3(26, 3, 6);
+    cam.lookat = point3(0, 2, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
+void cornell_box() {
+    hittable_list world;
+
+    auto red = std::make_shared<lambertian>(color(0.65, 0.05, 0.05));
+    auto white = std::make_shared<lambertian>(color(0.73, 0.73, 0.73));
+    auto green = std::make_shared<lambertian>(color(0.12, 0.45, 0.15));
+    auto light = std::make_shared<diffuse_light>(color(15, 15, 15));
+
+    world.add(std::make_shared<quad>(point3(555, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), green));
+    world.add(std::make_shared<quad>(point3(0, 0, 0), vec3(0, 0, 555), vec3(0, 555, 0), red));
+    world.add(std::make_shared<quad>(point3(343, 554, 332), vec3(-130, 0, 0), vec3(0, 0, -105), light));
+    world.add(std::make_shared<quad>(point3(0, 0, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    world.add(std::make_shared<quad>(point3(555, 555, 555), vec3(-555, 0, 0), vec3(0, 0, -555), white));
+    world.add(std::make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
+
+    std::shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = std::make_shared<rotate_y>(box1, 15);
+    box1 = std::make_shared<translate>(box1, vec3(265, 0, 295));
+    world.add(box1);
+
+    std::shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = std::make_shared<rotate_y>(box2, -18);
+    box2 = std::make_shared<translate>(box2, vec3(130, 0, 65));
+    world.add(box2);
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 200;
+    cam.max_depth = 32;
+    cam.background = colors::black();
+    cam.vfov = 40;
+    cam.lookfrom = point3(278, 278, -800);
+    cam.lookat = point3(278, 278, 0);
     cam.vup = vec3(0, 1, 0);
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
@@ -276,6 +352,12 @@ int main(int argc, char** argv) {
     }
     else if (scene_choice == 6) {
         octohedron();
+    }
+    else if (scene_choice == 7) {
+        simple_light();
+    }
+    else if (scene_choice == 8) {
+        cornell_box();
     }
 
     return 0;

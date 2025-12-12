@@ -12,6 +12,9 @@ class material {
     public:
         virtual ~material() = default;
 
+        virtual color emitted(double u [[maybe_unused]],
+                              double v [[maybe_unused]],
+                              const point3& p [[maybe_unused]]) const { return color(0, 0, 0); }
         virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const = 0;
 };
 
@@ -48,4 +51,19 @@ class dielectric : public material {
         // the refractive index of the enclosing media
         double refraction_index;
         static double reflectance(double cosine, double refraction_index);
+};
+
+class diffuse_light : public material {
+    public:
+        diffuse_light(std::shared_ptr<texture> tex) : tex(tex) {}
+        diffuse_light(const color& emit) : tex(std::make_shared<solid_color>(emit)) {}
+
+        color emitted(double u, double v, const point3& p) const override { return tex->value(u, v, p); }
+        bool scatter(const ray& r_in [[maybe_unused]],
+                     const hit_record& rec [[maybe_unused]], 
+                     color& attenuation [[maybe_unused]], 
+                     ray& scattered [[maybe_unused]]) const override { return false; }
+
+    private:
+        std::shared_ptr<texture> tex;
 };
