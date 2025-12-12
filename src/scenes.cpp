@@ -11,6 +11,7 @@
 #include "raytracer/sphere.hpp"
 #include "raytracer/texture.hpp"
 #include "raytracer/triangle.hpp"
+#include "raytracer/triangle_mesh.hpp"
 #include "raytracer/vec3.hpp"
 
 void bouncing_spheres_1(unsigned num_threads) {
@@ -204,7 +205,7 @@ void octohedron_6(unsigned num_threads) {
     auto blue    = std::make_shared<lambertian>(colors::blue());
     auto yellow  = std::make_shared<lambertian>(colors::yellow());
     auto magenta = std::make_shared<lambertian>(colors::magenta());
-    auto red2    = std::make_shared<lambertian>(colors::red2());
+    auto cyan    = std::make_shared<lambertian>(colors::cyan());
     auto orange  = std::make_shared<lambertian>(colors::orange());
     auto purple  = std::make_shared<lambertian>(colors::purple());
     
@@ -220,7 +221,7 @@ void octohedron_6(unsigned num_threads) {
 
     // Octahedron bottom pyramid
     world.add(std::make_shared<triangle>(bottom, vec3( 2, 2, 2), vec3(-2, 2, 2), magenta)); // front
-    world.add(std::make_shared<triangle>(bottom, vec3(-2, 2, 2), vec3(-2, 2,-2), red2));    // left
+    world.add(std::make_shared<triangle>(bottom, vec3(-2, 2, 2), vec3(-2, 2,-2), cyan));    // left
     world.add(std::make_shared<triangle>(bottom, vec3(-2, 2,-2), vec3( 2, 2,-2), orange));  // back
     world.add(std::make_shared<triangle>(bottom, vec3( 2, 2,-2), vec3( 2, 2, 2), purple));  // right
 
@@ -424,3 +425,128 @@ void next_week_10(unsigned num_threads) {
 
     cam.render(world, "images/next_week_10.ppm", num_threads);
 }
+
+void triangle_mesh_11(unsigned num_threads) {
+    hittable_list world;
+
+    auto material = std::make_shared<lambertian>(colors::red());
+    auto mesh = std::make_shared<triangle_mesh>();
+    if (!mesh->load_from_obj("models/teapot.obj", material)) {
+        std::cerr << "Failed to load triangle mesh." << std::endl;
+        return;
+    }
+    world.add(mesh);
+
+    camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 16;
+    cam.background = color(0.7, 0.8, 1.0);
+    cam.vfov = 50;
+    cam.lookfrom = point3(0, 2, 5);
+    cam.lookat = point3(0, 1, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world, "images/triangle_mesh_11.ppm", num_threads);
+}
+
+void final_render_12(unsigned num_threads) {
+    hittable_list boxes1;
+    auto ground = std::make_shared<lambertian>(color(0.48, 0.83, 0.53));
+
+    int boxes_per_side = 20;
+    for (int i = 0; i < boxes_per_side; i++) {
+        for (int j = 0; j < boxes_per_side; j++) {
+            double w = 100;
+            double x0 = -1000 + i * w;
+            double z0 = -1000 + j * w;
+            double y0 = 0.0;
+            double x1 = x0 + w;
+            double y1 = random_double(1, 101);
+            double z1 = z0 + w;
+
+            // Randomize box colors
+            color box_color(random_double(), random_double(), random_double());
+            auto box_material = std::make_shared<lambertian>(box_color);
+            boxes1.add(box(point3(x0, y0, z0), point3(x1, y1, z1), box_material));
+        }
+    }
+
+    hittable_list world;
+
+    world.add(std::make_shared<bvh_node>(boxes1));
+
+    // Light source
+    auto light = std::make_shared<diffuse_light>(color(7, 7, 7));
+    world.add(std::make_shared<quad>(point3(123, 554, 147), vec3(300, 0, 0), vec3(0, 0, 265), light));
+
+    // Original spheres from next_week_10
+    auto center1 = point3(400, 400, 200);
+    auto center2 = center1 + vec3(30, 0, 0);
+    auto sphere_material = std::make_shared<lambertian>(color(0.7, 0.3, 0.1));
+    world.add(std::make_shared<sphere>(center1, center2, 50, sphere_material));
+
+    world.add(std::make_shared<sphere>(point3(260, 150, 45), 50, std::make_shared<dielectric>(1.5)));
+    world.add(std::make_shared<sphere>(point3(0, 150, 145), 50, std::make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
+
+    auto boundary = std::make_shared<sphere>(point3(360, 150, 145), 70, std::make_shared<dielectric>(1.5));
+    world.add(boundary);
+    world.add(std::make_shared<constant_medium>(boundary, 0.2, color(0.2, 0.4, 0.9)));
+    boundary = std::make_shared<sphere>(point3(0, 0, 0), 5000, std::make_shared<dielectric>(1.5));
+    world.add(std::make_shared<constant_medium>(boundary, 0.0001, color(1, 1, 1)));
+
+    auto emat = std::make_shared<lambertian>(std::make_shared<image_texture>("earthmap.jpg"));
+    world.add(std::make_shared<sphere>(point3(400, 200, 400), 100, emat));
+    auto pertext = std::make_shared<noise_texture>(0.2);
+    world.add(std::make_shared<sphere>(point3(220, 280, 300), 80, std::make_shared<lambertian>(pertext)));
+
+    hittable_list boxes2;
+    auto white = std::make_shared<lambertian>(color(0.73, 0.73, 0.73));
+    int ns = 1000;
+    for (int j = 0; j < ns; j++) {
+        boxes2.add(std::make_shared<sphere>(point3::random(0, 165), 10, white));
+    }
+
+    world.add(std::make_shared<translate>(std::make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2), 15), vec3(-100, 270, 395)));
+
+    // Add teapot mesh (red)
+    auto teapot_material = std::make_shared<lambertian>(colors::red());
+    auto teapot = std::make_shared<triangle_mesh>();
+    if (!teapot->load_from_obj("models/teapot.obj", teapot_material)) {
+        std::cerr << "Failed to load teapot mesh." << std::endl;
+        return;
+    }
+    // Position teapot in scene
+    world.add(std::make_shared<translate>(teapot, vec3(200, 100, 200)));
+
+    // Add Homer mesh (yellow)
+    auto homer_material = std::make_shared<lambertian>(color(1.0, 1.0, 0.0));  // yellow
+    auto homer = std::make_shared<triangle_mesh>();
+    if (!homer->load_from_obj("models/homer.obj", homer_material)) {
+        std::cerr << "Failed to load Homer mesh." << std::endl;
+        return;
+    }
+    // Position Homer in scene
+    world.add(std::make_shared<translate>(homer, vec3(150, 100, 400)));
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 800;
+    cam.samples_per_pixel = 2000;
+    cam.max_depth = 40;
+    cam.background = colors::black();
+    cam.vfov = 40;
+    cam.lookfrom = point3(478, 278, -600);
+    cam.lookat = point3(278, 278, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world, "images/final_render_12.ppm", num_threads);
+}
+

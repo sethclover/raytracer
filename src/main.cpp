@@ -97,6 +97,14 @@ int main(int argc, char** argv) {
         std::cout << "Rendering scene 10: Next Week\n";
         next_week_10(num_threads);
     }
+    else if (scene_choice == 11) {
+        std::cout << "Rendering scene 11: Triangle Mesh\n";
+        triangle_mesh_11(num_threads);
+    }
+    else if (scene_choice == 12) {
+        std::cout << "Rendering scene 12: Final Render\n";
+        final_render_12(num_threads);
+    }
 
     return 0;
 }
