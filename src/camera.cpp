@@ -1,26 +1,31 @@
+#include <atomic>
+#include <chrono>
+
 #include "raytracer/camera.hpp"
 #include "raytracer/image.hpp"
 
-void camera::render(const hittable& world, const std::string& output_filename) {
+void camera::render(const hittable& world, const std::string& output_filename) { 
     initialize();
-
     image img(image_width, image_height);
+    static std::atomic<int> lines_done(0);
+
+    auto start = std::chrono::high_resolution_clock::now();
 
     for (int j = 0; j < image_height; j++) {
-        std::cerr << "\rScanlines remaining: " << image_height - j << std::flush;
         for (int i = 0; i < image_width; i++) {
-            color pixel_color(0, 0, 0);
-            for (int sample = 0; sample < samples_per_pixel; sample++) {
-                ray r = get_ray(i, j);
-                pixel_color += ray_color(r, max_depth, world);
-            }
-            pixel_color /= samples_per_pixel;
-
-            img.at(i, j) = pixel_color;
+            img.at(i, j) = sample_pixel(i, j, world);
         }
+        lines_done++;
+
+        double progress = 100.0 * lines_done.load() / image_height;
+        int progress_rounded = static_cast<int>(progress * 10 + 0.5);
+        std::cerr << "\rProgress: " << (progress_rounded / 10) << '.' << (progress_rounded % 10)
+                  << "% completed. " << "Elapsed time: " 
+                  << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start).count()
+                  << " seconds" << std::flush;
     }
 
-    std::cerr << "\rDone.                         \n";
+    std::cerr << "\rDone.\033[K\n";
 
     img.write_ppm(output_filename);
 }
@@ -103,4 +108,15 @@ color camera::ray_color(const ray& r, int depth, const hittable& world) const {
     color color_from_scatter = attenuation * ray_color(scattered, depth - 1, world);
 
     return color_from_emission + color_from_scatter;
+}
+
+color camera::sample_pixel(int i, int j, const hittable& world) const {
+    color pixel_color(0, 0, 0);
+    for (int sample = 0; sample < samples_per_pixel; sample++) {
+        ray r = get_ray(i, j);
+        pixel_color += ray_color(r, max_depth, world);
+    }
+    pixel_color /= samples_per_pixel;
+
+    return pixel_color;
 }

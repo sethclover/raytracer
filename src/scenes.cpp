@@ -394,7 +394,7 @@ void next_week_10() {
     boundary = std::make_shared<sphere>(point3(0, 0, 0), 5000, std::make_shared<dielectric>(1.5));
     world.add(std::make_shared<constant_medium>(boundary, 0.0001, color(1, 1, 1)));
 
-    auto emat = std::make_shared<lambertian>(std::make_shared<image_texture>("earthmap.png"));
+    auto emat = std::make_shared<lambertian>(std::make_shared<image_texture>("earthmap.jpg"));
     world.add(std::make_shared<sphere>(point3(400, 200, 400), 100, emat));
     auto pertext = std::make_shared<noise_texture>(0.2);
     world.add(std::make_shared<sphere>(point3(220, 280, 300), 80, std::make_shared<lambertian>(pertext)));

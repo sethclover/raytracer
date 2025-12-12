@@ -44,4 +44,5 @@ class camera {
         vec3 sample_square() const;
         point3 defocus_disk_sample() const;
         color ray_color(const ray& r, int depth, const hittable& world) const;
+        color sample_pixel(int i, int j, const hittable& world) const;
 };
