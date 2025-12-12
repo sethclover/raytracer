@@ -4,6 +4,7 @@
 #include "bvh.hpp"
 #include "raytracer/camera.hpp"
 #include "raytracer/color.hpp"
+#include "raytracer/constant_medium.hpp"
 #include "raytracer/hittable_list.hpp"
 #include "raytracer/material.hpp"
 #include "raytracer/quad.hpp"
@@ -12,7 +13,7 @@
 #include "raytracer/triangle.hpp"
 #include "raytracer/vec3.hpp"
 
-static constexpr unsigned SCENE_COUNT = 8;
+static constexpr unsigned SCENE_COUNT = 10;
 
 // -h for help or number to choose from scenes
 static const std::string usage = "Usage: raytracer [-h | --help | <scene_number>]\n"
@@ -309,6 +310,120 @@ void cornell_box() {
     cam.render(world);
 }
 
+void cornell_smoke() {
+    hittable_list world;
+
+    auto red = std::make_shared<lambertian>(color(0.65, 0.05, 0.05));
+    auto white = std::make_shared<lambertian>(color(0.73, 0.73, 0.73));
+    auto green = std::make_shared<lambertian>(color(0.12, 0.45, 0.15));
+    auto light = std::make_shared<diffuse_light>(color(7, 7, 7));
+
+    world.add(std::make_shared<quad>(point3(555, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), green));
+    world.add(std::make_shared<quad>(point3(0, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), red));
+    world.add(std::make_shared<quad>(point3(113, 554, 127), vec3(330, 0, 0), vec3(0, 0, 305), light));
+    world.add(std::make_shared<quad>(point3(0, 555, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    world.add(std::make_shared<quad>(point3(0, 0, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    world.add(std::make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
+
+    std::shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = std::make_shared<rotate_y>(box1, 15);
+    box1 = std::make_shared<translate>(box1, vec3(265, 0, 295));
+
+    std::shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = std::make_shared<rotate_y>(box2, -18);
+    box2 = std::make_shared<translate>(box2, vec3(130, 0, 65));
+
+    world.add(std::make_shared<constant_medium>(box1, 0.01, color(0.0, 0.0, 0.0)));
+    world.add(std::make_shared<constant_medium>(box2, 0.01, color(1.0, 1.0, 1.0)));
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 200;
+    cam.max_depth = 32;
+    cam.background = colors::black();
+    cam.vfov = 40;
+    cam.lookfrom = point3(278, 278, -800);
+    cam.lookat = point3(278, 278, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
+void next_week() {
+    hittable_list boxes1;
+    auto ground = std::make_shared<lambertian>(color(0.48, 0.83, 0.53));
+
+    int boxes_per_side = 20;
+    for (int i = 0; i < boxes_per_side; i++) {
+        for (int j = 0; j < boxes_per_side; j++) {
+            double w = 100;
+            double x0 = -1000 + i * w;
+            double z0 = -1000 + j * w;
+            double y0 = 0.0;
+            double x1 = x0 + w;
+            double y1 = random_double(1, 101);
+            double z1 = z0 + w;
+
+            boxes1.add(box(point3(x0, y0, z0), point3(x1, y1, z1), ground));
+        }
+    }
+
+    hittable_list world;
+
+    world.add(std::make_shared<bvh_node>(boxes1));
+
+    auto light = std::make_shared<diffuse_light>(color(7, 7, 7));
+    world.add(std::make_shared<quad>(point3(123, 554, 147), vec3(300, 0, 0), vec3(0, 0, 265), light));
+
+    auto center1 = point3(400, 400, 200);
+    auto center2 = center1 + vec3(30, 0, 0);
+    auto sphere_material = std::make_shared<lambertian>(color(0.7, 0.3, 0.1));
+    world.add(std::make_shared<sphere>(center1, center2, 50, sphere_material));
+
+    world.add(std::make_shared<sphere>(point3(260, 150, 45), 50, std::make_shared<dielectric>(1.5)));
+    world.add(std::make_shared<sphere>(point3(0, 150, 145), 50, std::make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
+
+    auto boundary = std::make_shared<sphere>(point3(360, 150, 145), 70, std::make_shared<dielectric>(1.5));
+    world.add(boundary);
+    world.add(std::make_shared<constant_medium>(boundary, 0.2, color(0.2, 0.4, 0.9)));
+    boundary = std::make_shared<sphere>(point3(0, 0, 0), 5000, std::make_shared<dielectric>(1.5));
+    world.add(std::make_shared<constant_medium>(boundary, 0.0001, color(1, 1, 1)));
+
+    auto emat = std::make_shared<lambertian>(std::make_shared<image_texture>("earthmap.png"));
+    world.add(std::make_shared<sphere>(point3(400, 200, 400), 100, emat));
+    auto pertext = std::make_shared<noise_texture>(0.2);
+    world.add(std::make_shared<sphere>(point3(220, 280, 300), 80, std::make_shared<lambertian>(pertext)));
+
+    hittable_list boxes2;
+    auto white = std::make_shared<lambertian>(color(0.73, 0.73, 0.73));
+    int ns = 1000;
+    for (int j = 0; j < ns; j++) {
+        boxes2.add(std::make_shared<sphere>(point3::random(0,165), 10, white));
+    }
+
+    world.add(std::make_shared<translate>(std::make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2), 15), vec3(-100, 270, 395)));
+
+    camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 800;
+    cam.samples_per_pixel = 10000;
+    cam.max_depth = 40;
+    cam.background = colors::black();
+    cam.vfov = 40;
+    cam.lookfrom = point3(478, 278, -600);
+    cam.lookat = point3(278, 278, 0);
+    cam.vup = vec3(0, 1, 0);
+    cam.defocus_angle = 0.0;
+    cam.focus_dist = 10.0;
+
+    cam.render(world);
+}
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         std::cerr << "Error: Expected 1 argument.\n" << usage;
@@ -358,6 +473,12 @@ int main(int argc, char** argv) {
     }
     else if (scene_choice == 8) {
         cornell_box();
+    }
+    else if (scene_choice == 9) {
+        cornell_smoke();
+    }
+    else if (scene_choice == 10) {
+        next_week();
     }
 
     return 0;

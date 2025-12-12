@@ -50,3 +50,10 @@ double dielectric::reflectance(double cosine, double refraction_index) {
 
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
 }
+
+bool isotropic::scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
+    scattered = ray(rec.p, random_unit_vector(), r_in.time());
+    attenuation = tex->value(rec.u, rec.v, rec.p);
+
+    return true;
+}

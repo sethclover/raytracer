@@ -67,3 +67,14 @@ class diffuse_light : public material {
     private:
         std::shared_ptr<texture> tex;
 };
+
+class isotropic : public material {
+    public:
+        isotropic(const color& albedo) : tex(std::make_shared<solid_color>(albedo)) {}
+        isotropic(std::shared_ptr<texture> tex) : tex(tex) {}
+
+        bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override;
+
+    private:
+        std::shared_ptr<texture> tex;
+};
