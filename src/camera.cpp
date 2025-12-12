@@ -1,21 +1,33 @@
 #include <atomic>
 #include <chrono>
+#include <thread>
 
 #include "raytracer/camera.hpp"
-#include "raytracer/image.hpp"
 
-void camera::render(const hittable& world, const std::string& output_filename) { 
+namespace {
+    std::atomic<int> lines_done(0);
+}
+
+void camera::render(const hittable& world, const std::string& output_filename, unsigned num_threads) { 
     initialize();
     image img(image_width, image_height);
-    static std::atomic<int> lines_done(0);
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    for (int j = 0; j < image_height; j++) {
-        for (int i = 0; i < image_width; i++) {
-            img.at(i, j) = sample_pixel(i, j, world);
-        }
-        lines_done++;
+    int rows_per_thread = image_height / num_threads;
+    std::vector<std::thread> threads;
+
+    for (unsigned int t = 0; t < num_threads; t++) {
+        int y_start = t * rows_per_thread;
+        int y_end = (t == num_threads - 1) ? image_height : y_start + rows_per_thread;
+
+        threads.emplace_back([this, y_start, y_end, &world, &img]() {
+            render_rows(y_start, y_end, world, img);
+        });
+    }
+
+    while (lines_done.load() < image_height) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
         double progress = 100.0 * lines_done.load() / image_height;
         int progress_rounded = static_cast<int>(progress * 10 + 0.5);
@@ -25,7 +37,14 @@ void camera::render(const hittable& world, const std::string& output_filename) {
                   << " seconds" << std::flush;
     }
 
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
     std::cerr << "\rDone.\033[K\n";
+    std::cerr << "Rendering completed in " << duration << " seconds\n";
 
     img.write_ppm(output_filename);
 }
@@ -119,4 +138,15 @@ color camera::sample_pixel(int i, int j, const hittable& world) const {
     pixel_color /= samples_per_pixel;
 
     return pixel_color;
+}
+
+void camera::render_rows(int y_start, int y_end, const hittable& world, image& img) const {
+    // This thread renders the rows from y_start to y_end (exclusive)
+    for (int y = y_start; y < y_end; y++) {
+        for (int x = 0; x < image_width; x++) {
+            img.at(x, y) = sample_pixel(x, y, world);
+        }
+
+        lines_done++; // Thread-safe atomic increment
+    }
 }

@@ -13,7 +13,7 @@
 #include "raytracer/triangle.hpp"
 #include "raytracer/vec3.hpp"
 
-void bouncing_spheres_1() {
+void bouncing_spheres_1(unsigned num_threads) {
     hittable_list world;
 
     // Add ground with checker texture
@@ -77,10 +77,10 @@ void bouncing_spheres_1() {
     cam.defocus_angle = 0.6;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/bouncing_spheres_1.ppm");
+    cam.render(world, "images/bouncing_spheres_1.ppm", num_threads);
 }
 
-void checkered_spheres_2() {
+void checkered_spheres_2(unsigned num_threads) {
     hittable_list world;
 
     // Add ground with checker texture
@@ -104,10 +104,10 @@ void checkered_spheres_2() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/checkered_spheres_2.ppm");
+    cam.render(world, "images/checkered_spheres_2.ppm", num_threads);
 }
 
-void earth_3() {
+void earth_3(unsigned num_threads) {
     hittable_list world;
 
     auto earth_texture = std::make_shared<image_texture>("earthmap.jpg");
@@ -134,10 +134,10 @@ void earth_3() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(hittable_list(world), "images/earth_3.ppm");
+    cam.render(hittable_list(world), "images/earth_3.ppm", num_threads);
 }
 
-void perlin_spheres_4() {
+void perlin_spheres_4(unsigned num_threads) {
     hittable_list world;
 
     auto pertext = std::make_shared<noise_texture>(4);
@@ -158,10 +158,10 @@ void perlin_spheres_4() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/perlin_spheres_4.ppm");
+    cam.render(world, "images/perlin_spheres_4.ppm", num_threads);
 }
 
-void quads_5() {
+void quads_5(unsigned num_threads) {
     hittable_list world;
 
     // Materials
@@ -192,10 +192,10 @@ void quads_5() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/quads_5.ppm");
+    cam.render(world, "images/quads_5.ppm", num_threads);
 }
 
-void octohedron_6() {
+void octohedron_6(unsigned num_threads) {
     hittable_list world;
 
     // Materials
@@ -238,10 +238,10 @@ void octohedron_6() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/octohedron_6.ppm");
+    cam.render(world, "images/octohedron_6.ppm", num_threads);
 }
 
-void simple_light_7() {
+void simple_light_7(unsigned num_threads) {
     hittable_list world;
 
     auto pertext = std::make_shared<noise_texture>(4);
@@ -266,10 +266,10 @@ void simple_light_7() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/simple_light_7.ppm");
+    cam.render(world, "images/simple_light_7.ppm", num_threads);
 }
 
-void cornell_box_8() {
+void cornell_box_8(unsigned num_threads) {
     hittable_list world;
 
     auto red = std::make_shared<lambertian>(color(0.65, 0.05, 0.05));
@@ -308,10 +308,10 @@ void cornell_box_8() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/cornell_box_8.ppm");
+    cam.render(world, "images/cornell_box_8.ppm", num_threads);
 }
 
-void cornell_smoke_9() {
+void cornell_smoke_9(unsigned num_threads) {
     hittable_list world;
 
     auto red = std::make_shared<lambertian>(color(0.65, 0.05, 0.05));
@@ -351,10 +351,10 @@ void cornell_smoke_9() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/cornell_smoke_9.ppm");
+    cam.render(world, "images/cornell_smoke_9.ppm", num_threads);
 }
 
-void next_week_10() {
+void next_week_10(unsigned num_threads) {
     hittable_list boxes1;
     auto ground = std::make_shared<lambertian>(color(0.48, 0.83, 0.53));
 
@@ -412,7 +412,7 @@ void next_week_10() {
 
     cam.aspect_ratio = 1.0;
     cam.image_width = 800;
-    cam.samples_per_pixel = 10000;
+    cam.samples_per_pixel = 2000;
     cam.max_depth = 40;
     cam.background = colors::black();
     cam.vfov = 40;
@@ -422,5 +422,5 @@ void next_week_10() {
     cam.defocus_angle = 0.0;
     cam.focus_dist = 10.0;
 
-    cam.render(world, "images/next_week_10.ppm");
+    cam.render(world, "images/next_week_10.ppm", num_threads);
 }

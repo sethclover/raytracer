@@ -5,6 +5,7 @@
 
 #include "raytracer/color.hpp"
 #include "raytracer/hittable.hpp"
+#include "raytracer/image.hpp"
 #include "raytracer/interval.hpp"
 #include "raytracer/material.hpp"
 #include "raytracer/ray.hpp"
@@ -26,7 +27,7 @@ class camera {
 
         camera() = default;
 
-        void render(const hittable& world, const std::string& output_filename);
+        void render(const hittable& world, const std::string& output_filename, unsigned num_threads);
 
     private:
         int image_height;           // Rendered image height
@@ -45,4 +46,5 @@ class camera {
         point3 defocus_disk_sample() const;
         color ray_color(const ray& r, int depth, const hittable& world) const;
         color sample_pixel(int i, int j, const hittable& world) const;
+        void render_rows(int y_start, int y_end, const hittable& world, image& img) const;
 };
