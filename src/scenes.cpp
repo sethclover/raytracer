@@ -529,7 +529,7 @@ void final_render_12(unsigned num_threads) {
     // Add Homer mesh (yellow) - positioned on top of earth
     auto homer_material = std::make_shared<lambertian>(color(1.0, 1.0, 0.0));  // yellow
     auto homer = std::make_shared<triangle_mesh>();
-    if (!homer->load_from_obj("models/homer.obj", homer_material, 210.0)) {
+    if (!homer->load_from_obj("models/homer.obj", homer_material, 190.0)) {
         std::cerr << "Failed to load Homer mesh." << std::endl;
         return;
     }
@@ -540,7 +540,7 @@ void final_render_12(unsigned num_threads) {
 
     cam.aspect_ratio = 1.0;
     cam.image_width = 800;
-    cam.samples_per_pixel = 3000;
+    cam.samples_per_pixel = 6000;
     cam.max_depth = 50;
     cam.background = colors::black();
     cam.vfov = 40;

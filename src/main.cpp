@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -38,11 +39,12 @@ int main(int argc, char** argv) {
     unsigned num_threads = std::thread::hardware_concurrency(); // default
     if (argc >= 4 && (std::string(argv[2]) == "-t" || std::string(argv[2]) == "--threads")) {
         try {
-            num_threads = std::stoul(argv[3]);
+            unsigned requested_threads = std::stoul(argv[3]);
             if (num_threads == 0) {
                 std::cerr << "Error: Thread count must be positive.\n" << usage;
                 return 1;
             }
+            num_threads = std::min(requested_threads, num_threads);
         } catch (const std::exception& e [[maybe_unused]]) {
             std::cerr << "Error: Invalid thread count '" << argv[3] << "'.\n" << usage;
             return 1;

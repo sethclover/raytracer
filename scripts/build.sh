@@ -1,17 +1,11 @@
 #!/bin/bash
-# build.sh - Automates CMake build process
+# build.sh - Automates CMake build process (Release mode)
 
-# Create build directory if not exists
-mkdir -p build
-
-# Enter build directory
-cd build
-
-# Run CMake configuration step
-cmake ..
+# Configure with CMake (Release mode)
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 
 # Build project
-cmake --build .
+cmake --build build --config Release
 
-# Return to project root
-cd ..
+echo ""
+echo "Build complete. Executable: build/raytracer"

@@ -1,17 +1,22 @@
 @echo off
-REM build.bat - Automates CMake build process
+REM build.bat - Automates CMake build process (Release mode)
 
 REM Create build directory if it doesn't exist
 if not exist build mkdir build
 
-REM Enter build directory
-cd build
-
-REM Run CMake configuration step
-cmake ..
+REM Configure project with CMake (Release mode)
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+if %ERRORLEVEL% neq 0 (
+    echo CMake configuration failed.
+    exit /b %ERRORLEVEL%
+)
 
 REM Build project
-cmake --build .
+cmake --build build --config Release
+if %ERRORLEVEL% neq 0 (
+    echo Build failed.
+    exit /b %ERRORLEVEL%
+)
 
-REM Return to project root
-cd ..
+echo.
+echo Build complete. Executable: build/Release/raytracer.exe
