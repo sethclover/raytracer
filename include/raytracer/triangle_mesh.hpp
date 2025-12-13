@@ -12,7 +12,7 @@
 
 class triangle_mesh : public hittable {
     public:
-        bool load_from_obj(const std::string& filepath, std::shared_ptr<material> material);
+        bool load_from_obj(const std::string& filepath, std::shared_ptr<material> material, double scale = 1.0);
         bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
         aabb bounding_box() const override { return bbox; }
     

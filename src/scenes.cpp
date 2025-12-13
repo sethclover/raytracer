@@ -466,7 +466,7 @@ void final_render_12(unsigned num_threads) {
             double z0 = -1000 + j * w;
             double y0 = 0.0;
             double x1 = x0 + w;
-            double y1 = random_double(1, 101);
+            double y1 = random_double(1, 91);
             double z1 = z0 + w;
 
             // Lavender purple for lower boxes
@@ -505,7 +505,7 @@ void final_render_12(unsigned num_threads) {
     auto emat = std::make_shared<lambertian>(std::make_shared<image_texture>("earthmap.jpg"));
     world.add(std::make_shared<sphere>(point3(400, 200, 400), 100, emat));
     
-    auto pertext = std::make_shared<noise_texture>(0.2);
+    auto pertext = std::make_shared<noise_texture>(1);
     world.add(std::make_shared<sphere>(point3(220, 280, 300), 80, std::make_shared<lambertian>(pertext)));
 
     hittable_list boxes2;
@@ -520,28 +520,28 @@ void final_render_12(unsigned num_threads) {
     // Add teapot mesh (red) - positioned below glass ball at y=50
     auto teapot_material = std::make_shared<lambertian>(colors::red());
     auto teapot = std::make_shared<triangle_mesh>();
-    if (!teapot->load_from_obj("models/teapot.obj", teapot_material)) {
+    if (!teapot->load_from_obj("models/teapot.obj", teapot_material, 13.0)) {
         std::cerr << "Failed to load teapot mesh." << std::endl;
         return;
     }
-    world.add(std::make_shared<translate>(teapot, vec3(260, 50, 45)));
+    world.add(std::make_shared<translate>(std::make_shared<rotate_y>(teapot, 15), vec3(260, 250, 45)));
 
     // Add Homer mesh (yellow) - positioned on top of earth
     auto homer_material = std::make_shared<lambertian>(color(1.0, 1.0, 0.0));  // yellow
     auto homer = std::make_shared<triangle_mesh>();
-    if (!homer->load_from_obj("models/homer.obj", homer_material)) {
+    if (!homer->load_from_obj("models/homer.obj", homer_material, 210.0)) {
         std::cerr << "Failed to load Homer mesh." << std::endl;
         return;
     }
-    world.add(std::make_shared<translate>(homer, vec3(400, 320, 400)));
+    world.add(std::make_shared<translate>(std::make_shared<rotate_y>(homer, -155), vec3(380, 320, 360)));
 
     // Camera setup
     camera cam;
 
     cam.aspect_ratio = 1.0;
-    cam.image_width = 800;
-    cam.samples_per_pixel = 2000;
-    cam.max_depth = 40;
+    cam.image_width = 350;
+    cam.samples_per_pixel = 350;
+    cam.max_depth = 20;
     cam.background = colors::black();
     cam.vfov = 40;
     cam.lookfrom = point3(478, 278, -600);

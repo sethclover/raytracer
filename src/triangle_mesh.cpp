@@ -5,7 +5,7 @@
 #include "raytracer/hittable_list.hpp"
 #include "raytracer/triangle_mesh.hpp"
 
-bool triangle_mesh::load_from_obj(const std::string& filepath, std::shared_ptr<material> material) {
+bool triangle_mesh::load_from_obj(const std::string& filepath, std::shared_ptr<material> material, double scale) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -27,15 +27,15 @@ bool triangle_mesh::load_from_obj(const std::string& filepath, std::shared_ptr<m
             auto idx2 = shape.mesh.indices[i + 2];
 
             // Extract positions
-            point3 v0(attrib.vertices[3 * idx0.vertex_index],
-                      attrib.vertices[3 * idx0.vertex_index + 1],
-                      attrib.vertices[3 * idx0.vertex_index + 2]);
-            point3 v1(attrib.vertices[3 * idx1.vertex_index],
-                      attrib.vertices[3 * idx1.vertex_index + 1],
-                      attrib.vertices[3 * idx1.vertex_index + 2]);
-            point3 v2(attrib.vertices[3 * idx2.vertex_index],
-                      attrib.vertices[3 * idx2.vertex_index + 1],
-                      attrib.vertices[3 * idx2.vertex_index + 2]);
+            point3 v0(attrib.vertices[3 * idx0.vertex_index] * scale,
+                      attrib.vertices[3 * idx0.vertex_index + 1] * scale,
+                      attrib.vertices[3 * idx0.vertex_index + 2] * scale);
+            point3 v1(attrib.vertices[3 * idx1.vertex_index] * scale,
+                      attrib.vertices[3 * idx1.vertex_index + 1] * scale,
+                      attrib.vertices[3 * idx1.vertex_index + 2] * scale);
+            point3 v2(attrib.vertices[3 * idx2.vertex_index] * scale,
+                      attrib.vertices[3 * idx2.vertex_index + 1] * scale,
+                      attrib.vertices[3 * idx2.vertex_index + 2] * scale);
 
             // Create triangle with shared material
             triangles.add(std::make_shared<triangle>(v0, v1 - v0, v2 - v0, material));
