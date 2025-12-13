@@ -539,9 +539,9 @@ void final_render_12(unsigned num_threads) {
     camera cam;
 
     cam.aspect_ratio = 1.0;
-    cam.image_width = 350;
-    cam.samples_per_pixel = 350;
-    cam.max_depth = 20;
+    cam.image_width = 800;
+    cam.samples_per_pixel = 3000;
+    cam.max_depth = 50;
     cam.background = colors::black();
     cam.vfov = 40;
     cam.lookfrom = point3(478, 278, -600);
