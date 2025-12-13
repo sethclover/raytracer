@@ -469,9 +469,8 @@ void final_render_12(unsigned num_threads) {
             double y1 = random_double(1, 101);
             double z1 = z0 + w;
 
-            // Randomize box colors
-            color box_color(random_double(), random_double(), random_double());
-            auto box_material = std::make_shared<lambertian>(box_color);
+            // Lavender purple for lower boxes
+            auto box_material = std::make_shared<lambertian>(color(0.78, 0.60, 0.96));
             boxes1.add(box(point3(x0, y0, z0), point3(x1, y1, z1), box_material));
         }
     }
@@ -490,7 +489,10 @@ void final_render_12(unsigned num_threads) {
     auto sphere_material = std::make_shared<lambertian>(color(0.7, 0.3, 0.1));
     world.add(std::make_shared<sphere>(center1, center2, 50, sphere_material));
 
+    // Glass ball (dielectric)
     world.add(std::make_shared<sphere>(point3(260, 150, 45), 50, std::make_shared<dielectric>(1.5)));
+    
+    // Metal sphere
     world.add(std::make_shared<sphere>(point3(0, 150, 145), 50, std::make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
 
     auto boundary = std::make_shared<sphere>(point3(360, 150, 145), 70, std::make_shared<dielectric>(1.5));
@@ -499,8 +501,10 @@ void final_render_12(unsigned num_threads) {
     boundary = std::make_shared<sphere>(point3(0, 0, 0), 5000, std::make_shared<dielectric>(1.5));
     world.add(std::make_shared<constant_medium>(boundary, 0.0001, color(1, 1, 1)));
 
+    // Earth sphere
     auto emat = std::make_shared<lambertian>(std::make_shared<image_texture>("earthmap.jpg"));
     world.add(std::make_shared<sphere>(point3(400, 200, 400), 100, emat));
+    
     auto pertext = std::make_shared<noise_texture>(0.2);
     world.add(std::make_shared<sphere>(point3(220, 280, 300), 80, std::make_shared<lambertian>(pertext)));
 
@@ -513,26 +517,25 @@ void final_render_12(unsigned num_threads) {
 
     world.add(std::make_shared<translate>(std::make_shared<rotate_y>(std::make_shared<bvh_node>(boxes2), 15), vec3(-100, 270, 395)));
 
-    // Add teapot mesh (red)
+    // Add teapot mesh (red) - positioned below glass ball at y=50
     auto teapot_material = std::make_shared<lambertian>(colors::red());
     auto teapot = std::make_shared<triangle_mesh>();
     if (!teapot->load_from_obj("models/teapot.obj", teapot_material)) {
         std::cerr << "Failed to load teapot mesh." << std::endl;
         return;
     }
-    // Position teapot in scene
-    world.add(std::make_shared<translate>(teapot, vec3(200, 100, 200)));
+    world.add(std::make_shared<translate>(teapot, vec3(260, 50, 45)));
 
-    // Add Homer mesh (yellow)
+    // Add Homer mesh (yellow) - positioned on top of earth
     auto homer_material = std::make_shared<lambertian>(color(1.0, 1.0, 0.0));  // yellow
     auto homer = std::make_shared<triangle_mesh>();
     if (!homer->load_from_obj("models/homer.obj", homer_material)) {
         std::cerr << "Failed to load Homer mesh." << std::endl;
         return;
     }
-    // Position Homer in scene
-    world.add(std::make_shared<translate>(homer, vec3(150, 100, 400)));
+    world.add(std::make_shared<translate>(homer, vec3(400, 320, 400)));
 
+    // Camera setup
     camera cam;
 
     cam.aspect_ratio = 1.0;
@@ -549,4 +552,3 @@ void final_render_12(unsigned num_threads) {
 
     cam.render(world, "images/final_render_12.ppm", num_threads);
 }
-
