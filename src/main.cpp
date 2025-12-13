@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     unsigned scene_choice = 0;
     try {
         scene_choice = std::stoul(arg1);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& e [[maybe_unused]]) {
         std::cerr << "Error: Invalid scene number '" << arg1 << "'.\n" << usage;
         return 1;
     }
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
                 std::cerr << "Error: Thread count must be positive.\n" << usage;
                 return 1;
             }
-        } catch (const std::exception& e) {
+        } catch (const std::exception& e [[maybe_unused]]) {
             std::cerr << "Error: Invalid thread count '" << argv[3] << "'.\n" << usage;
             return 1;
         }

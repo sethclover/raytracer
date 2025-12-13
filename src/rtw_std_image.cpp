@@ -12,11 +12,30 @@ rtw_image::rtw_image(const char* image_filename) {
     // width() and height() will return 0
 
     auto filename = std::string(image_filename);
-    auto imagedir = std::getenv("RTW_IMAGES");
+
+    const char* imagedir = nullptr;
+#ifdef _MSC_VER
+    char* env_value = nullptr;
+    size_t len = 0;
+    if (_dupenv_s(&env_value, &len, "RTW_IMAGES") == 0 && env_value != nullptr) {
+        imagedir = env_value;
+    }
+#else
+    imagedir = std::getenv("RTW_IMAGES");
+#endif
 
     // Hunt for the image file in various directories
-    if (imagedir && load(std::string(imagedir) + "/" + image_filename)) return;
-    else if (load(filename)) return;
+    if (imagedir && load(std::string(imagedir) + "/" + image_filename)) {
+#ifdef _MSC_VER
+        free(env_value);
+#endif
+        return;
+    }
+#ifdef _MSC_VER
+    if (env_value) free(env_value);
+#endif
+    
+    if (load(filename)) return;
     else if (load("images/" + filename)) return;
     else if (load("../images/" + filename)) return;
     else if (load("../../images/" + filename)) return;

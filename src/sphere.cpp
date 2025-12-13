@@ -1,3 +1,5 @@
+#include <numbers>
+
 #include "raytracer/sphere.hpp"
 
 bool sphere::hit(const ray& r, interval ray_t, hit_record& rec) const {
@@ -37,8 +39,8 @@ void sphere::get_sphere_uv(const point3& p, double& u, double& v) const {
     // v: returned value [0,1] of angle from Y=-1 to Y=+1
 
     auto theta = std::acos(-p.y());
-    auto phi = std::atan2(-p.z(), p.x()) + M_PI;
+    auto phi = std::atan2(-p.z(), p.x()) + std::numbers::pi;
 
-    u = phi / (2 * M_PI);
-    v = theta / M_PI;
+    u = phi / (2 * std::numbers::pi);
+    v = theta / std::numbers::pi;
 }
